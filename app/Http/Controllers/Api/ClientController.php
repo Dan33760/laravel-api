@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Models\Store;
+use App\Models\Panier;
 use App\Models\StoreUser;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Client\FirstUserResource;
 use App\Http\Resources\Client\FirstStoreResource;
+use App\Http\Resources\Panier\SecondPanierCollection;
 use App\Http\Resources\Client\FirstClientStoreCollection;
 
 class ClientController extends Controller
@@ -53,6 +55,12 @@ class ClientController extends Controller
     public function getProduitByStore($id)
     {
         return new FirstStoreResource(Store::find($id));
+    }
+
+    //__ Recuperer les Paniers d'un Client
+    public function getPanier(Request $request)
+    {
+        return new SecondPanierCollection(Panier::where('user_id', $request->user()->id)->get());
     }
 
 }
