@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources\Store;
 
-use App\Http\Resources\User\FirstUserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FirstStoreResource extends JsonResource
+class SecondStoreResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,7 +16,6 @@ class FirstStoreResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'tenant' => new FirstUserResource($this->user),
             'designation' => $this->name_store,
             'status' => $this->status_store,
             'created_at' => $this->created_at,

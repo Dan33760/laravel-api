@@ -61,6 +61,7 @@ class ClientController extends Controller
     public function getPanier(Request $request)
     {
         return new SecondPanierCollection(Panier::where('user_id', $request->user()->id)->get());
+        // return $request->user();
     }
 
 }

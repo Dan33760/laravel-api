@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Produit;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -42,13 +43,21 @@ class Store extends Model
 
     public function updateStore_($id_store, $id_tenant, $data)
     {
-        $update = Store::where('id', $id_store)
-            ->where('user_id', $id_tenant)
-            ->update($data);
-        
-        if(!$update){
-            return false;
+        $store = Store::find($id_store);
+        $response = Gate::inspect('update', $store);
+        if ($response->allowed()) {
+            // The action is authorized...
+            $update = Store::where('id', $id_store)
+                // ->where('user_id', $id_tenant)
+                ->update($data);
+            
+            if(!$update){
+                return false;
+            }
+        } else {
+            return $response->message();
         }
+        
 
         return true;
     }

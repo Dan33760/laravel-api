@@ -7,18 +7,32 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\UserCollection;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // $this->Gate::allows('access-admin');
+    }
     //-- Profil User ----
     public function profilUser(Request $request)
     {
-        $id = $request->user()->id;
-        $user = User::with('role')->find($id);
+        // $response = Gate::inspect('access-admin');
+        // if($response->allowed())
+        // {
+            $id = $request->user()->id;
+            return new UserResource(User::find($id));
+        // }else{
+        //     return response([$response->message()]);
+        // }
 
-        return new UserResource(User::find($id));
+        // $id = $request->user()->id;
+        // $user = User::with('role')->find($id);
+
+        // return new UserResource(User::find($id));
         // return new UserCollection(User::paginate());
     }
 

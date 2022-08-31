@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources\Store;
 
-use App\Http\Resources\User\FirstUserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Produit\SecondProduitCollection;
 
-class FirstStoreResource extends JsonResource
+class ThirdStoreResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,13 +17,13 @@ class FirstStoreResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'tenant' => new FirstUserResource($this->user),
             'designation' => $this->name_store,
             'status' => $this->status_store,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'count_produit' => $this->produits->count(),
             'count_client' => $this->users->count(),
+            'produits' => new SecondProduitCollection($this->produits)
         ];
     }
 }

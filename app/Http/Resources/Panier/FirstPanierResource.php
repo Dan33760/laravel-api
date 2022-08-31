@@ -23,8 +23,8 @@ class FirstPanierResource extends JsonResource
             'status' => $this->status_panier,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'client' => new FirstUserResource($this->user),
             'count_produits' => $this->produits->count(),
+            'client' => new FirstUserResource($this->user),
             'produits' => new FirstProduitCollection($this->produits)
         ];
     }
