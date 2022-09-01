@@ -15,6 +15,26 @@ use App\Http\Resources\Client\FirstClientStoreCollection;
 
 class ClientController extends Controller
 {
+    //__ Recuperer les boutiques du client __
+    public function getClientStore(Request $request)
+    {
+        return new FirstUserResource(User::find($request->user()->id));
+        // return User::with('stores')->find($request->user()->id);
+    }
+
+    //__ Recuperer Les Produits D'une Boutique __
+    public function getProduitByStore($id)
+    {
+        return new FirstStoreResource(Store::find($id));
+    }
+
+    //__ Recuperer les Paniers d'un Client
+    public function getPanier(Request $request)
+    {
+        return new SecondPanierCollection(Panier::where('user_id', $request->user()->id)->get());
+        // return $request->user();
+    }
+
     //__ Recuperer Toute les Boutique __
     public function getStores()
     {
@@ -43,25 +63,4 @@ class ClientController extends Controller
             'message' => 'Client ajouter'
         ], 200);
     }
-
-    //__ Recuperer les boutiques du client __
-    public function getClientStore(Request $request)
-    {
-        return new FirstUserResource(User::find($request->user()->id));
-        // return User::with('stores')->find($request->user()->id);
-    }
-
-    //__ Recuperer Les Produits D'une Boutique __
-    public function getProduitByStore($id)
-    {
-        return new FirstStoreResource(Store::find($id));
-    }
-
-    //__ Recuperer les Paniers d'un Client
-    public function getPanier(Request $request)
-    {
-        return new SecondPanierCollection(Panier::where('user_id', $request->user()->id)->get());
-        // return $request->user();
-    }
-
 }

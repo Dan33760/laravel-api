@@ -6,10 +6,19 @@ use App\Models\Image;
 use App\Models\Produit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class ProduitController extends Controller
 {
+    public function __construct()
+    {
+        // Gate::authorize('access-tenant');
+
+        // $this->middleware('auth');
+        // Gate::allowIf(fn ($user) => $user->role->role == 'tenant')
+    }
+
     //__ Ajouter Un Produit __
     public function addProduit(Request $request)
     {
@@ -30,21 +39,27 @@ class ProduitController extends Controller
             ], 401);
         }
 
-        $filename = time() . '.' . $request->image->extension();
-        $path = $request->file('image')->storeAs('produits', $filename, 'public');
-        $image = new Image(['url' => $path]);
+        // $response = Gate::inspect('access-tenant');
+        // if($response->allowed()) {
 
-        $produit = Produit::addProduit_($request->all());
-        $save = $produit->image()->save($image);
+            $filename = time() . '.' . $request->image->extension();
+            $path = $request->file('image')->storeAs('produits', $filename, 'public');
+            $image = new Image(['url' => $path]);
 
-        if(!$save) {
-            return response(['status' => false, 'message' => 'Produit non enregistrer']);
-        }
+            $produit = Produit::addProduit_($request->all());
+            $produit->image()->save($image);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Produit enregistrer',
-        ], 200);
+            return response([
+                'status' => true,
+                'message' => 'Produit Ajouté'
+            ]);
+
+        // } else {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => $response->message()
+        //     ], 404);
+        // }
     }
 
      //__ Modifier Un Produit __
@@ -118,6 +133,8 @@ class ProduitController extends Controller
     //__ Activer Ou Desactiver un Produit __
     public function updateStatus($id)
     {
+        // Gate::allowIf(fn ($user) => $user->role->role == 'tenant');
+        // Gate::authorize('access-tenant');
         $produit = Produit::find($id);
         
         if(!$produit) {

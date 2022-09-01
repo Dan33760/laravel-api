@@ -68,7 +68,9 @@ class StorePolicy
      */
     public function delete(User $user, Store $store)
     {
-        return $user->id === $store->user_id;
+        return $user->id === $store->user_id
+                    ? Response::allow()
+                    : Response::deny('Yo do not own this store.');
     }
 
     /**
@@ -80,7 +82,9 @@ class StorePolicy
      */
     public function restore(User $user, Store $store)
     {
-        return $user->id === $store->user_id;
+        return $user->id === $store->user_id
+                    ? Response::allow()
+                    : Response::deny('Yo do not own this store.');
     }
 
     /**
@@ -92,6 +96,8 @@ class StorePolicy
      */
     public function forceDelete(User $user, Store $store)
     {
-        return $user->id === $store->user_id;
+        return $user->id === $store->user_id
+                    ? Response::allow()
+                    : Response::deny('Yo do not own this store.');
     }
 }

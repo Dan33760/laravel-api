@@ -41,23 +41,9 @@ class Store extends Model
         return true;
     }
 
-    public function updateStore_($id_store, $id_tenant, $data)
+    public function updateStore_($id, $data)
     {
-        $store = Store::find($id_store);
-        $response = Gate::inspect('update', $store);
-        if ($response->allowed()) {
-            // The action is authorized...
-            $update = Store::where('id', $id_store)
-                // ->where('user_id', $id_tenant)
-                ->update($data);
-            
-            if(!$update){
-                return false;
-            }
-        } else {
-            return $response->message();
-        }
-        
+        $update = Store::where('id', $id)->update(['name_store' => $data['name_store']]);
 
         return true;
     }

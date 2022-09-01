@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\PanierController;
 use App\Http\Controllers\Api\TenantController;
 use App\Http\Controllers\Api\ProduitController;
+use App\Http\Controllers\Api\TestMailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +27,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/', function () {
+    return response([
+        'status' => true,
+        'message' => 'Confirmation reussie, Bienvenu dans votre Compte'
+    ]);
+});
+
+Route::get('/send_mail', [TestMailController::class, 'sendMailUser'])->middleware('auth:sanctum');
 Route::post('/register', [AuthController::class, 'registerUser']);
 Route::post('/login', [AuthController::class, 'loginUser']);
 Route::get('/profil', [UserController::class, 'profilUser'])->middleware('auth:sanctum');
-Route::post('/image_profil', [UserController::class, 'imageProfil'])->middleware('auth:sanctum');
+Route::post('/image_profil', [UserController::class, 'imageProfil'])->middleware('auth:sanctum')->middleware('role');
 
 //__ Routes Pour l'Admin __
 Route::middleware('auth:sanctum')->prefix('admin')->group( function () {

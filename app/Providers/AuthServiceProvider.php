@@ -28,9 +28,21 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('access-admin', function (User $user) {
-            return $user->role === 'admin'
-                        ? Response::allowed()
+            return $user->role->role === 'admin'
+                        ? Response::allow()
                         : Response::deny('Tu dois etre admin');
+        });
+
+        Gate::define('access-tenant', function (User $user) {
+            return $user->role->role === 'tenant'
+                        ? Response::allow()
+                        : Response::deny('Tu dois etre tenant');
+        });
+
+        Gate::define('access-client', function (User $user) {
+            return $user->role->role === 'client'
+                        ? Response::allow()
+                        : Response::deny('Tu dois etre client');
         });
     }
 }

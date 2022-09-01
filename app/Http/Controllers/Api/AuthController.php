@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\UserRegisteredNotification;
 
 class AuthController extends Controller
 {
@@ -32,6 +33,8 @@ class AuthController extends Controller
 
             //-- Create User
             $user = User::saveUser($request);
+
+            // $user->notify(new UserRegisteredNotification());
 
             return response()->json([
                 'status' => true,

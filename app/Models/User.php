@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\UserRegisteredNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -86,6 +87,8 @@ class User extends Authenticatable
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->save();
+
+        $user->notify(new UserRegisteredNotification());
 
         return true;
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\StoreCollection;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Tenant\TenantStoreCollection;
@@ -26,12 +27,21 @@ class StoreController extends Controller
             ], 401);
         }
 
-        Store::addStore_($request);
+        $response = Gate::inspect('access-tenant');
+        if($response->allowed()) {
+            Store::addStore_($request->all());
+            
+            return response([
+                'status' => true,
+                'message' => 'Boutique Ajoutéé'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => $response->message()
+            ], 404);
+        }
         
-        return response([
-            'status' => true,
-            'message' => 'Boutique Ajoutéé'
-        ]);
 
     }
 
@@ -49,33 +59,34 @@ class StoreController extends Controller
                 'error' => $validateStore->errors()
             ], 401);
         }
-        $data = ['name_store' => $request->name_store];
-        $update = Store::updateStore_($id_store, $request->user()->id, $data);
 
-        if(!$update){
+        $store = Store::find($id_store);
+        $response = Gate::inspect('update', $store);
+        if ($response->allowed()) {
+            // Store::updateStore_($id_store, $request->all());
+            $store->name_store = $request->name_store;
+            $store->update();
+
             return response([
+                    'status' => true,
+                    'message' => 'Boutique Modifiée'
+                ]);
+        } else {
+            return response()->json([
                 'status' => false,
-                'message' => 'Boutique non Modifiée'
-            ]);
+                'message' => $response->message()
+            ], 404);
         }
-        
-        return response([
-            'status' => true,
-            'message' => 'Boutique Modifiée'
-        ]);
     }
 
     //__ Activer Ou Desactiver une Boutique __
     public function updateStatus(Request $request, $id_store)
     {
-        $store = Store::find($request->id);
-        if(!$store) {
-            return response()->json([
-                'message' => 'boutique non trouver'
-            ]);
-        }
+        $store = Store::find($id_store);
+        $response = Gate::inspect('update', $store);
 
         $data = [];
+        $message = null;
         if($store->status_store === 1) {
             $data = ['status_store' => 0];
             $message = 'Boutique Desactivéé';
@@ -86,38 +97,37 @@ class StoreController extends Controller
             $message = 'Boutique Activée';
         }
 
-        $update = Store::updateStore_($id_store, $request->user()->id, $data);
-
-        if(!$update){
+        if ($response->allowed()) {
+            Store::where('id', $id_store)->update($data);
             return response([
+                    'status' => true,
+                    'message' => $message
+                ]);
+        } else {
+            return response()->json([
                 'status' => false,
-                'message' => 'Erreur'
-            ]);
+                'message' => $response->message()
+            ], 404);
         }
-        
-        return response([
-            'status' => true,
-            'message' => $message
-        ]);
     }
 
     //__ Supprimer Une Boutique __
-    public function deleteStore(Request $request)
+    public function deleteStore($id_store)
     {
-        $delete = Store::where('id', $request->id)
-                        ->where('user_id', $request->user()->id)
-                        ->delete();
+        $store = Store::find($id_store);
+        $response = Gate::inspect('delete', $store);
+        if ($response->allowed()) {
+            $delete = Store::where('id', $id_store)->delete();
 
-        if(!$delete){
             return response([
+                'status' => true,
+                'message' => 'Boutique Supprimeée'
+                ]);
+        } else {
+            return response()->json([
                 'status' => false,
-                'message' => 'Boutique non Trouver'
-            ]);
+                'message' => $response->message()
+            ], 404);
         }
-        
-        return response([
-            'status' => true,
-            'message' => 'Boutique Supprimeée'
-        ]);
     }
 }

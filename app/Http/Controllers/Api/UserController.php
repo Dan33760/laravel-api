@@ -7,33 +7,40 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\UserCollection;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 class UserController extends Controller
 {
-    public function __construct()
+    // public function __construct()
+    // {
+    //     $this->middleware( function ($request, $next) {
+    //         if(!$request->user()->role->role === 'client') {
+    //             return response([
+    //                 'status' => false,
+    //                 'message' => 'you must be client.'
+    //             ]);
+    //         }
+    //         return $next($request);
+    //     });
+    // }
+
+    public function __construct(Gate $gate)
     {
-        // $this->Gate::allows('access-admin');
+        // Since we're cool, we are using the new Arrow Function introduced in PHP 7.4.
+        // For those who don't like the bleeding edge until it becomes 120% stable,
+        // you can use a Closure. The only difference are the number of lines.
+        $gate->define('see-dashboard', fn ($user) => $user->role->role == 'tenant');
+        
+        // Now, we can just simply call the authorization middleware like normal.
+        $this->middleware('can:see-dashboard');
     }
+
     //-- Profil User ----
     public function profilUser(Request $request)
     {
-        // $response = Gate::inspect('access-admin');
-        // if($response->allowed())
-        // {
-            $id = $request->user()->id;
-            return new UserResource(User::find($id));
-        // }else{
-        //     return response([$response->message()]);
-        // }
-
-        // $id = $request->user()->id;
-        // $user = User::with('role')->find($id);
-
-        // return new UserResource(User::find($id));
-        // return new UserCollection(User::paginate());
+        return new UserResource(User::find($request->user()->id));
     }
 
     //-- Ajouter Photo Profil --
