@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use App\Models\Image;
 use Illuminate\Http\Request;
+use App\Events\UserProfilEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
@@ -31,16 +32,20 @@ class UserController extends Controller
         // Since we're cool, we are using the new Arrow Function introduced in PHP 7.4.
         // For those who don't like the bleeding edge until it becomes 120% stable,
         // you can use a Closure. The only difference are the number of lines.
-        $gate->define('see-dashboard', fn ($user) => $user->role->role == 'tenant');
+        // $gate->define('see-dashboard', fn ($user) => $user->role->role == 'tenant');
         
         // Now, we can just simply call the authorization middleware like normal.
-        $this->middleware('can:see-dashboard');
+        // $this->middleware('can:see-dashboard');
     }
 
     //-- Profil User ----
     public function profilUser(Request $request)
     {
-        return new UserResource(User::find($request->user()->id));
+        $user = User::find($request->user()->id);
+        
+        event(new UserProfilEvent($user));
+        
+        return new UserResource(User::find($request->user()->id));;
     }
 
     //-- Ajouter Photo Profil --

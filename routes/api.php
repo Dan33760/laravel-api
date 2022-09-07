@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\PanierController;
 use App\Http\Controllers\Api\TenantController;
 use App\Http\Controllers\Api\ProduitController;
 use App\Http\Controllers\Api\TestMailController;
+use App\Http\Controllers\Api\PlaceholderAPIController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,9 @@ Route::post('/register', [AuthController::class, 'registerUser']);
 Route::post('/login', [AuthController::class, 'loginUser']);
 Route::get('/profil', [UserController::class, 'profilUser'])->middleware('auth:sanctum');
 Route::post('/image_profil', [UserController::class, 'imageProfil'])->middleware('auth:sanctum')->middleware('role');
+Route::get('/notification', [AuthController::class, 'notification'])->middleware('auth:sanctum');
+
+Route::get('/json/', [PlaceholderAPIController::class, 'index']);
 
 //__ Routes Pour l'Admin __
 Route::middleware('auth:sanctum')->prefix('admin')->group( function () {

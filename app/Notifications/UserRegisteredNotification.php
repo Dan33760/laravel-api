@@ -11,20 +11,25 @@ class UserRegisteredNotification extends Notification
 {
     use Queueable;
 
-    public function __construct()
+    public $user;
+    public $post;
+
+    public function __construct($user, $post)
     {
-        //
+        $this->user = $user;
+        $this->post = $post;
     }
 
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
+                    ->line('Notification pour l\'utilisateur '. $notifiable->name .
+                            ' pour le post ' . $this->post['title'])
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
     }
@@ -32,7 +37,8 @@ class UserRegisteredNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'title' => 'Mon title est ' . $this->post['title'],
+            'mon_email' => $notifiable->email
         ];
     }
 }

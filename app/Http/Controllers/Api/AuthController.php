@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Mail\WelcomUserMail;
 use Illuminate\Http\Request;
+use App\Jobs\SendWelcomUserJob;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\UserRegisteredNotification;
 
@@ -32,9 +36,21 @@ class AuthController extends Controller
             }
 
             //-- Create User
-            $user = User::saveUser($request);
+            // $user = User::saveUser($request);
 
-            // $user->notify(new UserRegisteredNotification());
+            $user = new User;
+
+            $user->role_id = (int) $request->role;
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            $post = ['title' => 'Super Title'];
+
+            // $user->notify(new UserRegisteredNotification($user, $post));
+
+
 
             return response()->json([
                 'status' => true,
@@ -77,6 +93,8 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
+            SendWelcomUserJob::dispatch($user);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Utilisateur Connecté',
@@ -89,5 +107,14 @@ class AuthController extends Controller
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+
+    public function notification()
+    {
+        $user = User::find(13);
+
+        return response([
+            'notification' => $user->notifications
+        ]);
     }
 }
